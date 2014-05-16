@@ -1,0 +1,7 @@
+language: node_js
+node_js:
+  - '0.10'
+before_install:
+  - currentfolder=${PWD##*/}
+  - if [ "$currentfolder" != 'generator-sxweb' ]; then cd .. && eval "mv $currentfolder generator-sxweb" && cd generator-sxweb; fi
+
