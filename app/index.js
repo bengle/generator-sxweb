@@ -47,6 +47,7 @@ SxwebGenerator.prototype.app = function app() {
 
   this.copy('_package.json', 'package.json');//将_package.json复制到目标文件夹下，并重命名为package.json
   this.copy('_bower.json', 'bower.json');
+  this.copy('_gitignore', '.gitignore');
 };
 
 SxwebGenerator.prototype.projectfiles = function projectfiles() {

@@ -1,105 +1,59 @@
-module.exports = function(grunt) {
-  // load all grunt tasks
-  require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+module.exports = function(grunt){
 
-  grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
-    concat: {
-      options: {
-        separator: ';'
-      },
-      dist: {
-        src: ['src/js/*.js'],
-        dest: 'dist/js/<%= pkg.name %>-<%= pkg.version %>.js'
-      }
-    },
-    uglify: {
-      options: {
-        banner: '/*! <%= pkg.name %>-<%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
-        beautify: {
-          ascii_only: true
+    grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
+        jshint: {
+            files: ['src/**/*.js'],
+            options: {
+                globals: {
+                    jQuery: true,
+                    console: true,
+                    module: true
+                }
+            }
         },
-        compress: {
-          global_defs: {
-            'DEBUG': false
-          },
-          dead_code: true
-        }
-      },
-      dist: {
-        files: {
-          'dist/js/<%= pkg.name %>-<%= pkg.version %>.min.js': ['<%= concat.dist.dest %>']
-        }
-      }
-    },
-    qunit: {
-      files: ['test/**/*.html']
-    },
-    jshint: {
-      files: ['src/**/*.js'],
-      options: {
-        // read jshint options from jshintrc file 
-        "jshintrc": ".jshintrc"
-      }
-    },
-    cssmin: {
-      build: {
-        files: {
-          'dist/css/<%= pkg.name %>-<%= pkg.version %>.min.css': [ 'src/css/*.css' ]
-        }
-      }
-    },
-    copy: {
-      css: {
-        cwd: 'src/css',
-        src: [ '*.css' ],
-        dest: 'dist/css',
-        expand: true
-      }
-    },
-    watch: {
-      coffee: {
-        files: ['src/js/**/*.coffee'],
-        tasks: ['coffee']
-      },
-      scripts: {
-        files: ['src/js/*.js', 'src/css/*.css'],
-        tasks: ['build']
-      }
-    },
-    coffee: {
-      compile: {
-        options: {
-          sourceMap: false
+        concat: {
+            options: {
+                separator: ';'
+            },
+            jsdist: {
+                src: ['src/pages/<%= pkg.pages %>/*.js'],
+                dest: 'build/pages/<%= pkg.pages %>/index.js'
+            },
+            cssdist: {
+                src: ['src/pages/<%= pkg.pages %>/*.css'],
+                dest: 'build/pages/<%= pkg.pages %>/index.css'
+            }
         },
-        expand: true,
-        cwd: 'src/js/coffee',
-        src: ['*.coffee'],
-        dest: 'src/js',
-        ext: '.coffee.js'
-      }
-    },
-    clean:{
-      spm : {
-        src: [ '**/.gitignore','**/.npmignore']
-      }
-    },
-    yuidoc: {
-      compile: {
-        name: '<%= pkg.name %>',
-        description: '<%= pkg.description %>',
-        version: '<%= pkg.version %>',
-        options: {
-          paths: 'src/js',
-          outdir: 'doc'
+        uglify: {
+            options: {
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+            },
+            dist: {
+                files: {
+                    'build/pages/<%= pkg.pages %>/index.min.js': ['<%= concat.jsdist.dest %>']
+                }
+            }
+        },
+        cssmin: {
+            minify: {
+                expand:true,
+                cwd:'build/pages/<%= pkg.pages %>/',
+                src:'index.css',
+                dest:'build/pages/<%= pkg.pages %>/',
+                ext:'.min.css'
+            }
         }
-      }
-    }
-  });
+    });
 
-  grunt.registerTask('build', ['test','coffee','concat','uglify','cssmin','copy','yuidoc']);
+    /**
+     * 载入使用到的通过NPM安装的模块
+     */
+    require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
-  grunt.registerTask('test', ['jshint', 'qunit']);
-
-  grunt.registerTask('default', ['build', 'watch']);
-};
+    /**
+     * 注册基本任务
+     */
+    grunt.registerTask('default', [ 'all' ]);
+    grunt.registerTask('build',['jshint','concat','uglify','cssmin']);
+}

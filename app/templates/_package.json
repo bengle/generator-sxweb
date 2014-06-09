@@ -1,5 +1,29 @@
 {
-  "name": "package",
-  "version": "0.0.0",
-  "dependencies": {}
+  "name": "project_power_by_sxweb",
+  "version": "0.0.1",
+  "generator_version": "0.0.1",
+  "description": "frontend workflow app",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": "",
+  "keywords": [
+    "sxweb"
+  ],
+  "author": "xujie <jie.xu@witown.cn>",
+  "license": "BSD",
+  "devDependencies": {
+      "grunt": "~0.4.1",
+      "grunt-contrib-copy": "*",
+      "grunt-contrib-concat":"*",
+      "grunt-contrib-jshint":"*",
+      "grunt-contrib-uglify": "~0.2.0",
+      "grunt-css-combo": ">=0.2.2",
+      "grunt-contrib-connect": "~0.3.0",
+      "grunt-contrib-cssmin": "~0.6.1",
+      "grunt-contrib-watch": "~0.3.1",
+      "matchdep": "~0.1.2"
+  },
+  "pages":["index"]
 }
