@@ -1,3 +1,4 @@
+var page = null;
 module.exports = function(grunt){
 
     grunt.initConfig({
@@ -12,17 +13,26 @@ module.exports = function(grunt){
                 }
             }
         },
+        copy: {
+            common: {
+                src: ['common/*'],
+                dest: 'build/',
+                filter: 'isFile'
+            }
+        },
         concat: {
             options: {
                 separator: ';'
             },
             jsdist: {
-                src: ['src/pages/<%= pkg.pages %>/*.js'],
-                dest: 'build/pages/<%= pkg.pages %>/index.js'
-            },
-            cssdist: {
-                src: ['src/pages/<%= pkg.pages %>/*.css'],
-                dest: 'build/pages/<%= pkg.pages %>/index.css'
+                src: ['src/pages/<%= grunt.config.get("page") %>/*.js'],
+                dest: 'build/pages/<%= grunt.config.get("page") %>/index.js'
+            }
+        },
+        css_combo: {
+            files: {
+                src: 'src/pages/<%= grunt.config.get("page") %>/index.css',
+                dest: 'build/pages/<%= grunt.config.get("page") %>/index.css'
             }
         },
         uglify: {
@@ -31,16 +41,16 @@ module.exports = function(grunt){
             },
             dist: {
                 files: {
-                    'build/pages/<%= pkg.pages %>/index.min.js': ['<%= concat.jsdist.dest %>']
+                    'build/pages/<%= grunt.config.get("page") %>/index.min.js': ['<%= concat.jsdist.dest %>']
                 }
             }
         },
         cssmin: {
             minify: {
                 expand:true,
-                cwd:'build/pages/<%= pkg.pages %>/',
+                cwd:'build/pages/<%= grunt.config.get("page") %>/',
                 src:'index.css',
-                dest:'build/pages/<%= pkg.pages %>/',
+                dest:'build/pages/<%= grunt.config.get("page") %>/',
                 ext:'.min.css'
             }
         }
@@ -55,5 +65,20 @@ module.exports = function(grunt){
      * 注册基本任务
      */
     grunt.registerTask('default', [ 'all' ]);
-    grunt.registerTask('build',['jshint','concat','uglify','cssmin']);
+    //grunt.registerTask('build',['jshint','copy','concat','css_combo','uglify','cssmin']);
+    grunt.registerTask('build',function(){
+        var pkg = grunt.file.readJSON('package.json');
+        //console.log(pkg.pages);
+        for(page in pkg.pages){
+            grunt.config.set('page',pkg.pages[page]);
+            console.log(grunt.config.get("page"));
+            grunt.task.run(['jshint','copy','concat','css_combo','uglify','cssmin']);
+            //grunt.task.run('jshint');
+            //grunt.task.run('copy');
+            //grunt.task.run('concat');
+            //grunt.task.run('css_combo');
+            //grunt.task.run('uglify');
+            //grunt.task.run('cssmin');
+        }
+    });
 }
