@@ -1,8 +1,16 @@
-var page = null;
+
 module.exports = function(grunt){
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        // buildBase: 'build',
+        // srcBase: 'src',
+        // packageName: 'page',
+        // pageName: options.pageName,
+        // pageSrcBase: '<%= srcBase %>/pages/<%= pageName %>/<%= packageName %>',
+        // commonSrcBase: '<%= srcBase %>/common',
+        // pageBuildBase: '<%= buildBase %>/pages/<%= pageName %>/<%= packageName %>',
+        // commonBuildBase: '<%= buildBase %>',
         jshint: {
             files: ['src/**/*.js'],
             options: {
@@ -24,13 +32,32 @@ module.exports = function(grunt){
             options: {
                 separator: ';'
             },
-            jsdist: {
+            // page: {
+            //     src: function(){
+            //         var oArr = [];
+            //         for(page in pkg.pages){
+            //             oArr.push('src/pages/'+page+'/*.js');
+            //         }
+            //         return oArr;
+            //     },
+            //     dest: function(){
+            //         var oArr = [];
+            //         for(page in pkg.pages){
+            //             oArr.push('build/pages/'+page+'/index.js');
+            //         }
+            //         return oArr;
+            //     }
+            // }
+            page: {
                 src: ['src/pages/<%= grunt.config.get("page") %>/*.js'],
                 dest: 'build/pages/<%= grunt.config.get("page") %>/index.js'
             }
         },
         css_combo: {
-            files: {
+            options: {
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+            },
+            page: {
                 src: 'src/pages/<%= grunt.config.get("page") %>/index.css',
                 dest: 'build/pages/<%= grunt.config.get("page") %>/index.css'
             }
@@ -39,14 +66,14 @@ module.exports = function(grunt){
             options: {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
             },
-            dist: {
+            page: {
                 files: {
-                    'build/pages/<%= grunt.config.get("page") %>/index.min.js': ['<%= concat.jsdist.dest %>']
+                    'build/pages/<%= grunt.config.get("page") %>/index.min.js': ['<%= concat.page.dest %>']
                 }
             }
         },
         cssmin: {
-            minify: {
+            page: {
                 expand:true,
                 cwd:'build/pages/<%= grunt.config.get("page") %>/',
                 src:'index.css',
@@ -64,21 +91,26 @@ module.exports = function(grunt){
     /**
      * 注册基本任务
      */
-    grunt.registerTask('default', [ 'all' ]);
-    //grunt.registerTask('build',['jshint','copy','concat','css_combo','uglify','cssmin']);
-    grunt.registerTask('build',function(){
-        var pkg = grunt.file.readJSON('package.json');
-        //console.log(pkg.pages);
-        for(page in pkg.pages){
-            grunt.config.set('page',pkg.pages[page]);
-            console.log(grunt.config.get("page"));
-            grunt.task.run(['jshint','copy','concat','css_combo','uglify','cssmin']);
-            //grunt.task.run('jshint');
-            //grunt.task.run('copy');
-            //grunt.task.run('concat');
-            //grunt.task.run('css_combo');
-            //grunt.task.run('uglify');
-            //grunt.task.run('cssmin');
-        }
+    
+    //grunt.registerTask('build',['jshint','copy:common','concat:page','css_combo:page','uglify:page','cssmin:page']);
+    grunt.registerTask('build',function(pageName){
+        if(pageName == 'common'){
+            grunt.task.run(['jshint','copy:common']);
+        }else{
+            grunt.config.set('page',pageName);
+            grunt.task.run(['jshint','copy:common','concat:page','css_combo:page','uglify:page','cssmin:page']);
+        } 
     });
+    // var pkg = grunt.file.readJSON('package.json');
+    // var pageNames = pkg.pages;
+    // var taskArr = [];
+    // for(page in pkg.pages){
+    //     grunt.registerTask('build',function(){
+    //         grunt.config.set('page',pkg.pages[page]);
+    //         console.log(grunt.config.get("page"));
+    //         grunt.task.run(['jshint','copy:common','concat:page','css_combo:page','uglify:page','cssmin:page']);
+    //     });
+    //     taskArr.push('task'+page);
+    // }
+    // grunt.registerTask('default', taskArr);
 }
